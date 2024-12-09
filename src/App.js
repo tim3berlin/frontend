@@ -1,16 +1,22 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import SignInSide from "./pages/SignInSide";
-import SignUpSide from "./pages/SignUpSide";
-import PinUser from "./pages/PinUser";
+import {
+  LogInPage,
+  PinUserPage,
+  InputEmailPage,
+  VerificationPage,
+  SellerRegistrationPage,
+} from "./pages";
 
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<SignUpSide />} />
-        <Route path="/pin" element={<PinUser />} />
-        <Route path="/signin" element={<SignInSide />} />
+        <Route path="/" element={<InputEmailPage />} />
+        <Route path="/verification" element={<VerificationPage />} />
+        <Route path="/pin" element={<PinUserPage />} />
+        <Route path="/login" element={<LogInPage />} />
+        <Route path="/registerseller" element={<SellerRegistrationPage />} />
       </Routes>
     </Router>
   );
