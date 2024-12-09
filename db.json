@@ -1,0 +1,67 @@
+{
+  "users": [
+    {
+      "id": "6aa0",
+      "email": "test@gmail.com",
+      "password": "11111111",
+      "pin": "111111"
+    },
+    {
+      "id": "a228",
+      "email": "test@gmail.com",
+      "password": "11111111"
+    },
+    {
+      "id": "91e3",
+      "email": "cicely@herbet.agency",
+      "password": "22222222"
+    },
+    {
+      "id": "cfc8",
+      "email": "cicely@herbet.agency",
+      "password": "22222222"
+    },
+    {
+      "id": "9dda",
+      "email": "cicely@herbet.agency",
+      "password": "22222222"
+    },
+    {
+      "id": "de2f",
+      "email": "cicely@herbet.agency",
+      "password": "22222222"
+    },
+    {
+      "id": "12d5",
+      "email": "cicely@herbet.agency",
+      "password": "22222222"
+    },
+    {
+      "id": "b8ea",
+      "email": "cicely@herbet.agency",
+      "password": "22222222"
+    },
+    {
+      "id": "cf45",
+      "email": "cicely@herbet.agency",
+      "password": "22222222"
+    },
+    {
+      "id": "217a",
+      "email": "percobaandua@gmail.com",
+      "password": "11111111",
+      "pin": "222222"
+    },
+    {
+      "id": "9736",
+      "email": "test@gmail.com",
+      "password": "22222222",
+      "pin": "111111"
+    },
+    {
+      "id": "ab2b",
+      "email": "test@gmail.com",
+      "password": "11111111"
+    }
+  ]
+}
