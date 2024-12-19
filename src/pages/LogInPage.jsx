@@ -2,8 +2,11 @@ import React, { useState } from "react";
 import { styled, ThemeProvider, createTheme } from "@mui/material/styles";
 import { Typography, Box, Button, TextField, Link } from "@mui/material";
 import * as Yup from "yup";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import apiClient from "../axios.js";
+import LogInAlert from "./LogInAlert";
+import LogInError from "./LogInError";
+import Cookies from "js-cookie";
 
 const theme = createTheme();
 
@@ -14,7 +17,7 @@ const Wrapper = styled(Box)(({ theme }) => ({
   height: "100vh",
   width: "100%",
   position: "relative",
-  backgroundImage: "url('/Images/Background Image (2).png')",
+  backgroundImage: "url('/assets/background_image_2.png')",
   backgroundSize: "cover",
   backgroundPosition: "center",
 }));
@@ -70,6 +73,9 @@ export default function LogInPage() {
   });
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertSeverity, setAlertSeverity] = useState("");
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -82,31 +88,51 @@ export default function LogInPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsSubmitting(true);
-    setErrors({});
-
-    const { email, password } = formData;
+    console.log("Button clicked!");
 
     try {
-      const response = await axios({
-        method: "POST",
-        url: "http://localhost:5000/users",
-        data: {
-          email,
-          password,
-        },
-      });
+      loginValidationSchema.validateSync(formData, { abortEarly: false });
 
-      if (response.data.success) {
-        localStorage.setItem("accessToken", "dummyAccessToken");
-        alert("Login successful! Redirecting...");
-        navigate("/");
+      console.log("Data:", formData);
+
+      const { email, password } = formData;
+
+      const response = await apiClient.post("/auth/login", { email, password });
+
+      console.log(response);
+
+      if (response.data.status === "success") {
+        Cookies.set("accessToken", response.data.access_token, {
+          expires: 7,
+        });
+        console.log("Token Set:", Cookies.get("accessToken"));
+        Cookies.set("refreshToken", response.data.refresh_token, {
+          expires: 7,
+        });
+        setAlertMessage("Login successful! Redirecting...");
+        setAlertSeverity("success");
+        setShowAlert(true);
+        setTimeout(() => {
+          navigate("/dashboardseller");
+        }, 1500);
       } else {
-        alert(response.data.message);
+        setAlertMessage(response.data.message);
+        setAlertSeverity("error");
+        setShowAlert(true);
       }
-    } catch (error) {
-      console.error("Login error", error);
-      alert("An error occurred during login.");
+    } catch (err) {
+      if (err instanceof Yup.ValidationError) {
+        const errors = {};
+        err.inner.forEach((error) => {
+          errors[error.path] = error.message;
+        });
+        setFormErrors(errors);
+      } else {
+        console.error("Login error:", err);
+        setAlertMessage("An error occurred during login.");
+        setAlertSeverity("error");
+        setShowAlert(true);
+      }
     }
 
     setIsSubmitting(false);
@@ -164,6 +190,41 @@ export default function LogInPage() {
             </form>
           </FormBox>
         </ContentBox>
+        {showAlert && (
+          <>
+            {alertSeverity === "success" ? (
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  position: "absolute",
+                  left: "50%",
+                  marginTop: "660px",
+                  transform: "translate(-50%, -50%)",
+                  width: "200px",
+                }}
+              >
+                <LogInAlert />
+              </Box>
+            ) : (
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  position: "absolute",
+                  left: "51%",
+                  marginTop: "660px",
+                  transform: "translate(-50%, -50%)",
+                  width: "400px",
+                }}
+              >
+                <LogInError />
+              </Box>
+            )}
+          </>
+        )}
       </Wrapper>
     </ThemeProvider>
   );
