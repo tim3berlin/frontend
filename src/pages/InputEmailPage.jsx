@@ -8,12 +8,13 @@ import {
   Button,
   Box,
   Link,
+  Alert,
 } from "@mui/material";
 import { styled, ThemeProvider, createTheme } from "@mui/material/styles";
 import InputEmailAlert from "./InputEmailAlert";
 import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import apiClient from "../axios.js";
 
 const theme = createTheme();
 
@@ -24,7 +25,7 @@ const Wrapper = styled(Box)(({ theme }) => ({
   height: "100vh",
   width: "100%",
   position: "relative",
-  backgroundImage: "url('/Images/Background Image.png')",
+  backgroundImage: "url('/assets/background_image.png')",
   backgroundSize: "cover",
   backgroundPosition: "center",
 }));
@@ -53,11 +54,12 @@ const FormBox = styled(Box)(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
+  marginTop: "-5px",
   marginLeft: "200px",
   width: "400px",
-  height: "365px",
+  minHeight: "425px",
   boxShadow: theme.shadows[5],
-  paddingTop: "40px",
+  transition: "min-height 0.3s ease",
 }));
 
 const SubTitleAndUSPBox = styled(Box)(({ theme }) => ({
@@ -90,7 +92,7 @@ const CheckBox = styled("span")(({ theme }) => ({
   width: "45px",
   height: "45px",
   marginRight: theme.spacing(2),
-  background: `url('/Images/Check Box.png') no-repeat center center`,
+  background: `url('/assets/check_box.png') no-repeat center center`,
   backgroundSize: "contain",
 }));
 
@@ -111,56 +113,75 @@ const SubmitButton = styled(Button)(({ theme }) => ({
 }));
 
 const emailValidationSchema = Yup.object({
+  firstName: Yup.string().required("First name is required"),
+  lastName: Yup.string().required("Last name is required"),
   email: Yup.string()
     .email("Invalid email address")
     .required("Email is required"),
   password: Yup.string()
     .required("Password is required")
-    .min(6, "Password must be at least 8 characters"),
+    .min(8, "Password must be at least 8 characters"),
 });
 
 export default function InputEmailPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+  });
+  const [formErrors, setFormErrors] = useState({});
   const [showAlert, setShowAlert] = useState(false);
   const navigate = useNavigate();
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("Button clicked");
 
     try {
-      emailValidationSchema.validateSync({ email, password });
-      setError("");
+      emailValidationSchema.validateSync(formData, { abortEarly: false });
 
-      const response = await axios.post("http://localhost:5000/users", {
-        email,
-        password,
+      console.log("Data:", formData);
+
+      const response = await apiClient.post("/auth/register", {
+        first_name: formData.firstName,
+        last_name: formData.lastName,
+        email: formData.email,
+        password: formData.password,
       });
 
-      if (response.status === 201) {
-        const userId = response.data.id;
-        localStorage.setItem("userId", userId);
+      console.log(response);
 
-        localStorage.setItem("email", email);
-        localStorage.setItem("password", password);
+      if (response.status === 200) {
+        localStorage.setItem("userId", response.data.id);
+        localStorage.setItem("firstName", formData.firstName);
+        localStorage.setItem("lastName", formData.lastName);
+        localStorage.setItem("email", formData.email);
 
         setShowAlert(true);
         setTimeout(() => {
-          navigate("/verification");
+          navigate("/verification", { state: { email: formData.email } });
         }, 1500);
       } else {
-        setError("Registration failed. Please try again.");
+        setFormErrors({ general: "Registration failed. Please try again." });
       }
-    } catch (error) {
-      if (error instanceof Yup.ValidationError) {
-        setError(error.message);
+    } catch (err) {
+      if (err instanceof Yup.ValidationError) {
+        const errors = {};
+        err.inner.forEach((error) => {
+          errors[error.path] = error.message;
+        });
+        setFormErrors(errors);
       } else {
-        console.error(
-          "API Error:",
-          error.response ? error.response.data : error.message
-        );
-        setError("An error occurred while submitting your data.");
+        setFormErrors({ general: "An error occurred. Please try again." });
       }
     }
   };
@@ -208,40 +229,54 @@ export default function InputEmailPage() {
               </Link>
             </Typography>
             <Form onSubmit={handleSubmit}>
+              <Box sx={{ display: "flex", gap: theme.spacing(2) }}>
+                <TextField
+                  margin="dense"
+                  variant="outlined"
+                  fullWidth
+                  label="First Name"
+                  name="firstName"
+                  value={formData.firstName}
+                  onChange={handleChange}
+                  error={!!formErrors.firstName}
+                  helperText={formErrors.firstName}
+                />
+                <TextField
+                  margin="dense"
+                  variant="outlined"
+                  fullWidth
+                  label="Last Name"
+                  name="lastName"
+                  value={formData.lastName}
+                  onChange={handleChange}
+                  error={!!formErrors.lastName}
+                  helperText={formErrors.lastName}
+                />
+              </Box>
               <TextField
+                margin="dense"
                 variant="outlined"
                 fullWidth
                 label="Email Address"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                error={!!error}
-                helperText={error}
-                style={{
-                  marginBottom: theme.spacing(3),
-                  marginTop: theme.spacing(1),
-                  backgroundColor: "#EDF8FF",
-                  borderRadius: "4px",
-                }}
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                error={!!formErrors.email}
+                helperText={formErrors.email}
               />
               <TextField
+                margin="dense"
                 variant="outlined"
                 fullWidth
                 label="Password"
+                name="password"
                 type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                error={!!error}
-                helperText={error}
-                InputProps={{
-                  style: { backgroundColor: "#EDF8FF", borderRadius: "4px" },
-                }}
+                value={formData.password}
+                onChange={handleChange}
+                error={!!formErrors.password}
+                helperText={formErrors.password}
               />
-              <SubmitButton
-                onClick={handleSubmit}
-                type="submit"
-                fullWidth
-                variant="contained"
-              >
+              <SubmitButton type="submit" fullWidth variant="contained">
                 Submit
               </SubmitButton>
               <Box style={{ textAlign: "center" }}>
@@ -254,13 +289,19 @@ export default function InputEmailPage() {
                 </Typography>
               </Box>
             </Form>
-            {showAlert && (
-              <Box style={{ marginTop: "65px", width: "400px" }}>
-                <InputEmailAlert />
-              </Box>
-            )}
           </FormBox>
         </ContentBox>
+        {showAlert && (
+          <Box
+            sx={{
+              width: "400px",
+              marginTop: theme.spacing(0),
+              marginLeft: "1140px",
+            }}
+          >
+            <InputEmailAlert />
+          </Box>
+        )}
       </Wrapper>
     </ThemeProvider>
   );

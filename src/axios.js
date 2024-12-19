@@ -1,40 +1,16 @@
 import axios from "axios";
 
+const apiurl = process.env.REACT_APP_APIURI;
+console.log("Test Halo:", apiurl);
+
 const apiClient = axios.create({
-  baseURL: "http://localhost:5000",
+  baseURL: apiurl,
   headers: {
     "Content-Type": "application/json",
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization",
   },
 });
 
-export const loginUser = async (email, password) => {
-  try {
-    const response = await apiClient.post("/users", {
-      email,
-      password,
-    });
-
-    if (response.data.success) {
-      localStorage.setItem("user", JSON.stringify(response.data.user));
-      return { success: true, user: response.data.user };
-    } else {
-      return { success: false, message: response.data.message };
-    }
-  } catch (error) {
-    console.error("Error during login", error);
-    return { success: false, message: "Login failed! Please try again." };
-  }
-};
-
 export default apiClient;
-
-// import axios from "axios";
-
-// const apiClient = axios.create({
-//   baseURL: "http://localhost:5000",
-//   headers: {
-//     "Content-Type": "application/json",
-//   },
-// });
-
-// export default apiClient;

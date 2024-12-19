@@ -4,8 +4,7 @@ import { styled, ThemeProvider, createTheme } from "@mui/material/styles";
 import { useNavigate, useLocation } from "react-router-dom";
 import VerificationAlert from "./VerificationAlert";
 import VerificationError from "./VerificationError";
-
-const DUMMY_CODE = "123456";
+import apiClient from "../axios.js";
 
 const theme = createTheme();
 
@@ -16,7 +15,7 @@ const Wrapper = styled(Box)(({ theme }) => ({
   height: "100vh",
   width: "100%",
   position: "relative",
-  backgroundImage: "url('/Images/Background Image.png')",
+  backgroundImage: "url('/assets/background_image.png')",
   backgroundSize: "cover",
   backgroundPosition: "center",
 }));
@@ -69,7 +68,7 @@ const CheckBox = styled("span")(({ theme }) => ({
   width: "45px",
   height: "45px",
   marginRight: theme.spacing(2),
-  background: `url('/Images/Check Box.png') no-repeat center center`,
+  background: `url('/assets/check_box.png') no-repeat center center`,
   backgroundSize: "contain",
 }));
 
@@ -144,17 +143,44 @@ export default function VerificationPage() {
     }
   };
 
-  const handleSubmit = () => {
-    if (code.join("") === DUMMY_CODE) {
-      setAlertMessage("Verification successful!");
-      setAlertSeverity("success");
-      setShowAlert(true);
+  const handleSubmit = async () => {
+    try {
+      const verificationCode = code.join("");
+      console.log("Data sent to API:", { email, code: verificationCode });
 
-      setTimeout(() => {
-        navigate("/pin");
-      }, 1500);
-    } else {
-      setAlertMessage("Invalid code. Please try again.");
+      const response = await apiClient.post("/auth/verify-otp", {
+        email: email,
+        otp: verificationCode,
+      });
+
+      console.log("Response from API:", response.data);
+
+      if (response.data.status === "success") {
+        console.log("Setting alert:", {
+          message: "Verification successful!",
+          severity: "success",
+        });
+        setAlertMessage("Verification successful!");
+        setAlertSeverity("success");
+        setShowAlert(true);
+
+        setTimeout(() => {
+          console.log("Navigating to login...");
+          navigate("/login");
+        }, 1500);
+      } else {
+        setAlertMessage("Invalid code. Please try again.");
+        setAlertSeverity("error");
+        setShowAlert(true);
+
+        setTimeout(() => {
+          setShowAlert(false);
+        }, 1500);
+      }
+    } catch (error) {
+      console.error("Error during OTP verification:", error.response || error);
+
+      setAlertMessage("An error occurred. Please try again later.");
       setAlertSeverity("error");
       setShowAlert(true);
 
@@ -218,11 +244,11 @@ export default function VerificationPage() {
             {showAlert && (
               <>
                 {alertSeverity === "success" ? (
-                  <Box style={{ width: "415px", marginTop: "60px" }}>
+                  <Box style={{ width: "415px", marginTop: "55px" }}>
                     <VerificationAlert message={alertMessage} />
                   </Box>
                 ) : (
-                  <Box style={{ width: "260px", marginTop: "60px" }}>
+                  <Box style={{ width: "260px", marginTop: "55px" }}>
                     <VerificationError message={alertMessage} />
                   </Box>
                 )}
