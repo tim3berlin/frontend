@@ -67,23 +67,31 @@ const EditPromotionPage = () => {
     (promo) => promo.id === parseInt(promotionId)
   );
 
+  const [startDate, setStartDate] = useState(
+    promotion ? new Date(promotion.startDate) : new Date()
+  );
+  const [endDate, setEndDate] = useState(
+    promotion ? new Date(promotion.endDate) : new Date()
+  );
+  const [startTime, setStartTime] = useState(
+    promotion
+      ? new Date(`${promotion.startDate}T${promotion.startTime}`)
+      : new Date()
+  );
+  const [endTime, setEndTime] = useState(
+    promotion
+      ? new Date(`${promotion.endDate}T${promotion.endTime}`)
+      : new Date()
+  );
+  const [name, setName] = useState(promotion ? promotion.name : "");
+  const [maxPurchaseQuantity, setMaxPurchaseQuantity] = useState(
+    promotion ? promotion.maxPurchaseQuantity : 0
+  );
+  const [discount, setDiscount] = useState(promotion ? promotion.discount : 0);
+
   if (!promotion) {
     return <Typography variant="h6">Promotion not found!</Typography>;
   }
-
-  const [startDate, setStartDate] = useState(new Date(promotion.startDate));
-  const [endDate, setEndDate] = useState(new Date(promotion.endDate));
-  const [startTime, setStartTime] = useState(
-    new Date(`${promotion.startDate}T${promotion.startTime}`)
-  );
-  const [endTime, setEndTime] = useState(
-    new Date(`${promotion.endDate}T${promotion.endTime}`)
-  );
-  const [name, setName] = useState(promotion.name);
-  const [maxPurchaseQuantity, setMaxPurchaseQuantity] = useState(
-    promotion.maxPurchaseQuantity
-  );
-  const [discount, setDiscount] = useState(promotion.discount);
 
   const handleDiscard = () => {
     navigate(`/dashboardseller/promotionlist`);
