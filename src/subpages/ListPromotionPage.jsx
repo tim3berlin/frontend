@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Box, Typography, Button, styled } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import DeletePromotionModal from "../modals/DeletePromotionModal";
 import apiClient from "../axios.js";
 import Cookies from "js-cookie";
@@ -12,25 +12,40 @@ const StyledButton = styled(Button)(({ theme }) => ({
 }));
 
 const ListPromotionPage = () => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [promotionToDelete, setPromotionToDelete] = useState(null);
   const [promotions, setPromotions] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const token = Cookies.get("accessToken");
+
   useEffect(() => {
     const fetchPromotions = async () => {
       try {
-        const token = Cookies.get("accessToken");
         console.log("Token from cookies:", token);
 
         const response = await apiClient.get("/promotions", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
+          withCredentials: true,
         });
-        console.log(response.data);
-        setPromotions(response.data);
+
+        setPromotions(response.data.promotions || []);
+        console.log("Response from API:", response.data.promotions);
+
+        const formattedPromotions = response.data.promotions.map(
+          (promotions) => ({
+            id: promotions.id || "",
+            promotionName: promotions.promotion_name || "",
+            periodStart: promotions.promotion_period_start || "",
+            periodEnd: promotions.promotion_period_end || "",
+            discount: promotions.discount_percent || "",
+          })
+        );
+
+        setPromotions(formattedPromotions);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching promotions:", error);
@@ -39,11 +54,7 @@ const ListPromotionPage = () => {
     };
 
     fetchPromotions();
-  }, []);
-
-  const handleEditPromotion = (promotionId) => {
-    navigate(`/editpromotion/${promotionId}`);
-  };
+  }, [token]);
 
   const handleDeletePromotion = (promotionId) => {
     setPromotionToDelete(promotionId);
@@ -53,6 +64,23 @@ const ListPromotionPage = () => {
   const handleCloseDeleteModal = () => {
     setOpenDeleteModal(false);
     setPromotionToDelete(null);
+  };
+
+  const handleConfirmDeletePromotion = async () => {
+    try {
+      await apiClient.delete(`/promotions/${promotionToDelete}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        withCredentials: true,
+      });
+
+      setPromotions(promotions.filter(promotion => promotion.id !== promotionToDelete));
+      setOpenDeleteModal(false);
+      setPromotionToDelete(null);
+    } catch (error) {
+      console.error("Error deleting promotion:", error);
+    }
   };
 
   if (loading) {
@@ -101,7 +129,7 @@ const ListPromotionPage = () => {
       {promotions.length > 0 ? (
         promotions.map((promotion) => (
           <Box
-            key={promotion.id}
+            key={promotions.id}
             sx={{
               display: "flex",
               justifyContent: "space-between",
@@ -114,10 +142,10 @@ const ListPromotionPage = () => {
               {promotion.promotion_name}
             </Typography>
             <Typography sx={{ width: "30%", textAlign: "center" }}>
-              {`${promotion.start_date} - ${promotion.end_date}`}
+              {`${promotion.promotion_period_start} - ${promotion.promotion_period_end}`}
             </Typography>
             <Typography sx={{ width: "20%", textAlign: "center" }}>
-              {promotion.discount}%
+              {promotion.discount_percent}%{" "}
             </Typography>
             <Box
               sx={{
@@ -127,15 +155,9 @@ const ListPromotionPage = () => {
               }}
             >
               <StyledButton
-                variant="contained"
-                onClick={() => handleEditPromotion(promotion.id)}
-              >
-                Edit
-              </StyledButton>
-              <StyledButton
                 variant="outlined"
                 sx={{ height: "90%" }}
-                onClick={() => handleDeletePromotion(promotion.id)}
+                onClick={() => handleDeletePromotion(promotions.id)}
               >
                 Delete
               </StyledButton>
@@ -152,7 +174,7 @@ const ListPromotionPage = () => {
         <DeletePromotionModal
           open={openDeleteModal}
           onClose={handleCloseDeleteModal}
-          promotionId={promotionToDelete}
+          onConfirm={handleConfirmDeletePromotion}
         />
       )}
     </Box>

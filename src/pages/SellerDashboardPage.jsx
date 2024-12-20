@@ -21,7 +21,7 @@ import {
   ExpandLess,
   ExpandMore,
 } from "@mui/icons-material";
-import { Outlet, Link } from "react-router-dom";
+import { useParams, Outlet, Link } from "react-router-dom";
 import LogoText from "../components/LogoText";
 
 const theme = createTheme();
@@ -93,11 +93,21 @@ const SellerDashboard = () => {
   const [open, setOpen] = useState({ products: false, promotions: false });
   const [isSidebarClicked, setIsSidebarClicked] = useState(false);
   const [currentPage, setCurrentPage] = useState("");
+  const { domain } = useParams();
+  const [storeDomain, setStoreDomain] = useState("");
 
   useEffect(() => {
     setCurrentPage(window.location.pathname);
     window.scrollTo(0, 0);
-  }, [window.location.pathname]);
+
+    setStoreDomain(domain);
+    console.log("Current Page:", window.location.pathname);
+    console.log("Store Domain:", domain);
+  }, [domain]);
+
+  console.log("Matching Path:", `/dashboardseller/${storeDomain}`);
+  console.log("Current Page:", currentPage);
+  console.log("Is Sidebar Clicked:", isSidebarClicked);
 
   const handleClick = (item) => {
     setOpen((prevState) => ({ ...prevState, [item]: !prevState[item] }));
@@ -209,31 +219,23 @@ const SellerDashboard = () => {
                   </ListItem>
                 </List>
               </Collapse>
-              <ListItem button component={Link} to="profilesettings">
-                <ListItemIcon>
-                  <AccountCircleIcon />
-                </ListItemIcon>
-                <ListItemText
-                  primary="Profile Settings"
-                  sx={{ color: "black" }}
-                />
-              </ListItem>
             </SidebarContent>
           </SidebarContentWrapper>
         </Sidebar>
         <Content>
-          {currentPage === "/dashboardseller" && !isSidebarClicked && (
-            <div
-              style={{
-                marginTop: "220px",
-                textAlign: "center",
-                fontSize: "2rem",
-                fontWeight: "bold",
-              }}
-            >
-              Welcome to Seller Dashboard!
-            </div>
-          )}
+          {currentPage === `/dashboardseller/${storeDomain}` &&
+            !isSidebarClicked && (
+              <div
+                style={{
+                  marginTop: "220px",
+                  textAlign: "center",
+                  fontSize: "2rem",
+                  fontWeight: "bold",
+                }}
+              >
+                Welcome to /{storeDomain} Dashboard!
+              </div>
+            )}
           <Outlet />
         </Content>
       </Wrapper>

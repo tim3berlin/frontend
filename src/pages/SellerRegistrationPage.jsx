@@ -71,7 +71,6 @@ export default function SellerRegistrationPage() {
     setMessage("");
 
     const token = Cookies.get("accessToken");
-    console.log("Token from cookies:", token);
 
     try {
       const response = await apiClient.post(
@@ -90,11 +89,9 @@ export default function SellerRegistrationPage() {
         }
       );
 
-      console.log("Success:", response.data);
       setMessage("Registration successful!");
-      navigate("/dashboardseller");
+      navigate(`/dashboardseller/${formData.storeDomain}`);
     } catch (error) {
-      console.error("Error:", error);
       setMessage("Registration failed. Please try again.");
     } finally {
       setLoading(false);

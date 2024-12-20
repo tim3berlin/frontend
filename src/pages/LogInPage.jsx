@@ -113,7 +113,7 @@ export default function LogInPage() {
         setAlertSeverity("success");
         setShowAlert(true);
         setTimeout(() => {
-          navigate("/dashboardseller");
+          navigate("/");
         }, 1500);
       } else {
         setAlertMessage(response.data.message);
@@ -126,7 +126,7 @@ export default function LogInPage() {
         err.inner.forEach((error) => {
           errors[error.path] = error.message;
         });
-        setFormErrors(errors);
+        setErrors(errors);
       } else {
         console.error("Login error:", err);
         setAlertMessage("An error occurred during login.");
@@ -152,7 +152,7 @@ export default function LogInPage() {
               style={{ fontSize: "17px", marginTop: "10px" }}
             >
               Don't have an account?{" "}
-              <Link href="/" variant="body2">
+              <Link href="/register" variant="body2">
                 Sign Up
               </Link>
             </Typography>
