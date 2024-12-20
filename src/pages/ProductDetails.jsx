@@ -183,18 +183,36 @@ const ProductDetail = ({
               >
                 {product.nama_produk}
               </Typography>
-              <Typography
-                variant="body2"
-                sx={{ color: "text.secondary", mb: 2 }}
-              >
-                {product.deskripsi}
-              </Typography>
+
               <Typography
                 variant="h6"
                 sx={{ fontWeight: "bold", color: "primary.main", mb: 2 }}
               >
-                ${product.harga.toFixed(2)}
+                Rp. {product.harga}
               </Typography>
+              {/* Deskripsi dengan label */}
+              <Box sx={{ marginBottom: 2 }}>
+                <Typography
+                  variant="body1"
+                  sx={{ fontWeight: "bold", color: "text.primary" }}
+                >
+                  Deskripsi:
+                </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: "text.secondary",
+                    mt: 1,
+                    padding: "10px",
+                    borderRadius: 1,
+                    backgroundColor: "#f9f9f9",
+                    boxShadow: 1,
+                    lineHeight: 1.5,
+                  }}
+                >
+                  {product.deskripsi}
+                </Typography>
+              </Box>
             </CardContent>
             <Box sx={{ display: "flex", justifyContent: "space-between" }}>
               <Button
