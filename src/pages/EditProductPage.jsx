@@ -81,99 +81,101 @@ const StyledSelect = styled(Select)(({ theme }) => ({
 }));
 
 const EditProductPage = () => {
-   const { productId } = useParams();
-   const navigate = useNavigate();
-   const [product, setProduct] = useState({
-     name: "",
-     description: "",
-     price: "",
-     stock: "",
-     category: "",
-     animalCategory: "",
-     weight: "",
-     photos: [],
-   });
+  const { productId } = useParams();
+  const navigate = useNavigate();
+  const [product, setProduct] = useState({
+    name: "",
+    description: "",
+    price: "",
+    stock: "",
+    category: "",
+    animalCategory: "",
+    weight: "",
+    photos: [],
+  });
 
-   const [formattedPrice, setFormattedPrice] = useState("");
-   const token = Cookies.get("accessToken");
+  const [formattedPrice, setFormattedPrice] = useState("");
+  const token = Cookies.get("accessToken");
 
-   const handlePhotoChange = (e, index) => {
-     const newPhotos = [...product.photos];
-     newPhotos[index] = e.target.files[0];
-     setProduct({ ...product, photos: newPhotos });
-   };
+  const handlePhotoChange = (e, index) => {
+    const newPhotos = [...product.photos];
+    newPhotos[index] = e.target.files[0];
+    setProduct({ ...product, photos: newPhotos });
+  };
 
-   const formatPrice = (value) => {
-     const numericValue = value.replace(/[^\d]/g, "");
-     return numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-   };
+  const formatPrice = (value) => {
+    const numericValue = value.replace(/[^\d]/g, "");
+    return numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  };
 
-   const handlePriceChange = (event) => {
-     const { value } = event.target;
-     const numericValue = value.replace(/[^\d]/g, "");
-     const formattedValue = formatPrice(value);
-     setProduct({ ...product, price: parseInt(numericValue, 10) });
-     setFormattedPrice(formattedValue);
-   };
+  const handlePriceChange = (event) => {
+    const { value } = event.target;
+    const numericValue = value.replace(/[^\d]/g, "");
+    const formattedValue = formatPrice(value);
+    setProduct({ ...product, price: parseInt(numericValue, 10) });
+    setFormattedPrice(formattedValue);
+  };
 
-   useEffect(() => {
-     apiClient
-       .get(`/products/${productId}`, {
-         headers: {
-           Authorization: `Bearer ${token}`,
-         },
-       })
-       .then((response) => {
-         const fetchedProduct = response.data.product;
-         setProduct({
-           name: fetchedProduct.nama_produk || "",
-           description: fetchedProduct.deskripsi || "",
-           price: fetchedProduct.harga || "",
-           stock: fetchedProduct.stok || "",
-           category: fetchedProduct.kategori || "",
-           animalCategory: fetchedProduct.jenis_hewan || "",
-           weight: fetchedProduct.berat || "",
-           photos: fetchedProduct.images || [],
-         });
-       })
-       .catch((error) => {
-         console.error("Error fetching product:", error);
-       });
-   }, [productId, token]);
+  useEffect(() => {
+    apiClient
+      .get(`/products/${productId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((response) => {
+        const fetchedProduct = response.data.product;
+        setProduct({
+          name: fetchedProduct.nama_produk || "",
+          description: fetchedProduct.deskripsi || "",
+          price: fetchedProduct.harga || "",
+          stock: fetchedProduct.stok || "",
+          category: fetchedProduct.kategori || "",
+          animalCategory: fetchedProduct.jenis_hewan || "",
+          weight: fetchedProduct.berat || "",
+          photos: fetchedProduct.images || [],
+        });
+      })
+      .catch((error) => {
+        console.error("Error fetching product:", error);
+      });
+  }, [productId, token]);
 
-   const handleSubmit = () => {
-     apiClient
-       .put(
-         `/seller/products/${productId}`,
-         {
-           nama_produk: product.name,
-           deskripsi: product.description,
-           harga: product.price,
-           stok: product.stock,
-           kategori: product.category,
-           jenis_hewan: product.animalCategory,
-           berat: product.weight,
-           images: product.photos,
-         },
-         {
-           headers: {
-             Authorization: `Bearer ${token}`,
-             "Content-Type": "application/json",
-           },
-         }
-       )
-       .then((response) => {
-         console.log("Product updated:", response.data);
-         navigate("/dashboardseller/productlist");
-       })
-       .catch((error) => {
-         console.error("Error updating product:", error);
-       });
-   };
+  const handleSubmit = () => {
+    apiClient
+      .put(
+        `/seller/products/${productId}`,
+        {
+          nama_produk: product.name,
+          deskripsi: product.description,
+          harga: product.price,
+          stok: product.stock,
+          kategori: product.category,
+          jenis_hewan: product.animalCategory,
+          berat: product.weight,
+          images: product.photos,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      )
+      .then((response) => {
+        console.log("Product updated:", response.data);
+        navigate(`/dashboardseller/${formData.storeDomain}/productlist`, {
+          state: { updatedProduct: response.data.product },
+        });
+      })
+      .catch((error) => {
+        console.error("Error updating product:", error);
+      });
+  };
 
-   const handleDiscard = () => {
-     navigate("/dashboardseller/productlist");
-   };
+  const handleDiscard = () => {
+    navigate(`/dashboardseller/${formData.storeDomain}/productlist`);
+  };
   return (
     <ThemeProvider theme={theme}>
       <EditProductContainer>
@@ -470,7 +472,7 @@ const EditProductPage = () => {
             onClick={() => {
               handleSubmit();
               console.log("Save product changes", product);
-              navigate("/dashboardseller/productlist");
+              navigate(`/dashboardseller/${formData.storeDomain}/productlist`);
             }}
           >
             Save Changes

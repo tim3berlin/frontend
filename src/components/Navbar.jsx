@@ -13,8 +13,9 @@ import Menu from "@mui/material/Menu";
 import SearchIcon from "@mui/icons-material/Search";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import FavoriteIcon from "@mui/icons-material/Favorite"; 
+import FavoriteIcon from "@mui/icons-material/Favorite";
 import { Button } from "@mui/material";
+import Cookies from "js-cookie";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -67,10 +68,14 @@ export default function PrimarySearchAppBar({
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
 
-  const handleLoginOpen = () => {
-    navigate("/register");
-    setAnchorEl(null);
-    handleMobileMenuClose();
+  const storeDomain = Cookies.get("store_domain") || "";
+
+  const handleDashboardSeller = () => {
+    if (storeDomain) {
+      navigate(`/dashboardseller/${storeDomain}`);
+    } else {
+      navigate("/registerseller");
+    }
   };
 
   const homeButton = () => {
@@ -120,7 +125,7 @@ export default function PrimarySearchAppBar({
       onClose={handleMenuClose}
     >
       <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-      <MenuItem onClick={handleLoginOpen}>My account</MenuItem>
+      <MenuItem onClick={() => navigate("/register")}>My account</MenuItem>
     </Menu>
   );
 
@@ -158,10 +163,9 @@ export default function PrimarySearchAppBar({
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <AppBar top="0" position="fixed" bottom="0" paddingX="15em">
+      <AppBar position="fixed">
         <Toolbar
           sx={{
-            marginX: "auto",
             justifyContent: "space-between",
             alignItems: "center",
             paddingLeft: 4,
@@ -196,6 +200,10 @@ export default function PrimarySearchAppBar({
               placeholder="Search…"
               inputProps={{ "aria-label": "search" }}
             />
+            <StyledInputBase
+              placeholder="Search…"
+              inputProps={{ "aria-label": "search" }}
+            />
           </Search>
 
           <Box
@@ -206,7 +214,6 @@ export default function PrimarySearchAppBar({
               paddingLeft: 10,
             }}
           >
-
             <IconButton
               onClick={wishlistButton}
               size="large"
@@ -240,6 +247,14 @@ export default function PrimarySearchAppBar({
             >
               <AccountCircle />
             </IconButton>
+            <Button
+              onClick={handleDashboardSeller}
+              variant="outlined"
+              color="inherit"
+              sx={{ marginLeft: 2 }}
+            >
+              {storeDomain ? "Dashboard Seller" : "Register Seller"}
+            </Button>
           </Box>
         </Toolbar>
       </AppBar>

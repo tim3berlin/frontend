@@ -4,6 +4,7 @@ import { styled, ThemeProvider, createTheme } from "@mui/material/styles";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { InputAdornment } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import apiClient from "../axios.js";
 
@@ -67,6 +68,7 @@ const AddPromotionPage = () => {
   const [endTime, setEndTime] = useState(null);
   const [maxQuantity, setMaxQuantity] = useState("");
   const [discount, setDiscount] = useState("");
+  const navigate = useNavigate();
 
   const formatTime = (time) => {
     if (!time) return "";
@@ -78,6 +80,7 @@ const AddPromotionPage = () => {
   const handleSave = async () => {
     try {
       const token = Cookies.get("accessToken");
+      const storeDomain = Cookies.get("store_domain") || "";
       console.log("Token from cookies:", token);
 
       const payload = {
@@ -102,11 +105,17 @@ const AddPromotionPage = () => {
       });
 
       console.log("Promotion created successfully:", response.data);
+
       alert("Promotion created successfully!");
+      navigate(`/dashboardseller/${storeDomain}`);
     } catch (error) {
       console.error("Failed to create promotion:", error);
       alert("An error occurred while creating the promotion.");
     }
+  };
+
+  const handleCancel = () => {
+    navigate(`/dashboardseller/${storeDomain}`);
   };
 
   return (
@@ -281,7 +290,7 @@ const AddPromotionPage = () => {
         </FormSection>
 
         <Box display="flex" justifyContent="flex-end" gap={2}>
-          <Button variant="contained" color="secondary">
+          <Button variant="contained" color="secondary" onClick={handleCancel}>
             Cancel
           </Button>
           <Button variant="contained" color="primary" onClick={handleSave}>
