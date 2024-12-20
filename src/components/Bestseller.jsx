@@ -1,19 +1,80 @@
-import React from "react";
-import { Box, Grid, Typography, Button, Card, CardMedia, CardContent, Chip, IconButton } from "@mui/material";
-import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
-import SearchIcon from "@mui/icons-material/Search";
+import React, { useState, useEffect } from "react";
+import { Box, Grid, Typography, Button, Skeleton } from "@mui/material";
 import ListProduct from "../components/ListProduct";
-import CssBaseline from "@mui/material/CssBaseline";
-import Container from "@mui/material/Container";
-import useFilterData from "../Context/useFilterData";
 import { useParams } from "react-router-dom";
+import Cookies from "js-cookie";
+import apiClient from "../axios.js";
 
 const Bestseller = ({ onAddCart, onRemoveCart, cart = [] }) => {
   const { category } = useParams();
-  const { products } = useFilterData(category ?? "");
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const fetchProducts = async () => {
+    try {
+      const token = Cookies.get("accessToken");
+      const response = await apiClient.get("products", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setProducts(response.data.products || []);
+      setLoading(false);
+    } catch (error) {
+      console.error(
+        "Error fetching products:",
+        error.response || error.message
+      );
+      setError(error.message);
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchProducts();
+  }, [category]);
+
+  if (loading) {
+    return (
+      <Box sx={{ margin: "auto", maxWidth: 1100, marginY: 4 }}>
+        <Typography variant="h5" gutterBottom>
+          Produk Terlaris{" "}
+          <span role="img" aria-label="paw">
+            🐾
+          </span>
+        </Typography>
+
+        <Grid container spacing={2}>
+          <Grid item xs={12} sm={4}>
+            <Skeleton variant="rectangular" width="100%" height={300} />
+            <Skeleton variant="text" width="80%" />
+            <Skeleton variant="text" width="60%" />
+            <Skeleton variant="text" width="40%" />
+          </Grid>
+
+          <Grid item xs={12} sm={8}>
+            <Grid container spacing={2}>
+              {[...Array(6)].map((_, index) => (
+                <Grid item xs={12} sm={6} md={4} key={index}>
+                  <Skeleton variant="rectangular" width="100%" height={200} />
+                  <Skeleton variant="text" width="80%" />
+                  <Skeleton variant="text" width="60%" />
+                </Grid>
+              ))}
+            </Grid>
+          </Grid>
+        </Grid>
+      </Box>
+    );
+  }
+
+  if (error) {
+    return <Typography color="error">{`Error: ${error}`}</Typography>;
+  }
+
   return (
     <Box sx={{ margin: "auto", maxWidth: 1100, marginY: 4 }}>
-      {/* Header */}
       <Typography variant="h5" gutterBottom>
         Produk Terlaris{" "}
         <span role="img" aria-label="paw">
@@ -22,7 +83,6 @@ const Bestseller = ({ onAddCart, onRemoveCart, cart = [] }) => {
       </Typography>
 
       <Grid container spacing={2}>
-        {/* Left Banner */}
         <Grid item xs={12} sm={4}>
           <Box
             sx={{
@@ -42,7 +102,11 @@ const Bestseller = ({ onAddCart, onRemoveCart, cart = [] }) => {
             <Typography variant="body2" sx={{ marginBottom: 2 }}>
               Semua kebutuhan Anjing kesayangan
             </Typography>
-            <Button variant="contained" color="primary" sx={{ borderRadius: 20, textTransform: "none" }}>
+            <Button
+              variant="contained"
+              color="primary"
+              sx={{ borderRadius: 20, textTransform: "none" }}
+            >
               Beli Sekarang
             </Button>
             <Typography
@@ -58,7 +122,12 @@ const Bestseller = ({ onAddCart, onRemoveCart, cart = [] }) => {
             >
               50% Off
             </Typography>
-            <Box component="img" src="https://via.placeholder.com/200" alt="Dog Food Banner" sx={{ width: "100%", marginTop: 2 }} />
+            <Box
+              component="img"
+              src="https://via.placeholder.com/200"
+              alt="Dog Food Banner"
+              sx={{ width: "100%", marginTop: 2 }}
+            />
           </Box>
         </Grid>
 
@@ -68,10 +137,10 @@ const Bestseller = ({ onAddCart, onRemoveCart, cart = [] }) => {
               <Grid item xs={12} sm={6} md={4} key={product.id}>
                 <ListProduct
                   id={product.id}
-                  title={product.title}
-                  description={product.description}
-                  image={product.image}
-                  price={product.price}
+                  title={product.nama_produk}
+                  description={product.deskripsi}
+                  image={product.images[0]?.url}
+                  price={product.harga}
                   onAddCart={() => onAddCart(product.id)}
                   onRemoveCart={() => onRemoveCart(product.id)}
                   inCart={Array.isArray(cart) && cart.includes(product.id)}
