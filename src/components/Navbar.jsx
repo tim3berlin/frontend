@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { styled, alpha } from "@mui/material/styles";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
@@ -12,7 +12,6 @@ import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
 import SearchIcon from "@mui/icons-material/Search";
 import AccountCircle from "@mui/icons-material/AccountCircle";
-import NotificationsIcon from "@mui/icons-material/Notifications";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import FavoriteIcon from "@mui/icons-material/Favorite"; 
 import { Button } from "@mui/material";
@@ -170,7 +169,6 @@ export default function PrimarySearchAppBar({
             height: "80px",
           }}
         >
-          {/* Left Section */}
           <Box
             sx={{
               display: "flex",
@@ -190,7 +188,6 @@ export default function PrimarySearchAppBar({
             </Button>
           </Box>
 
-          {/* Center Section */}
           <Search sx={{ alignItems: "center" }}>
             <SearchIconWrapper>
               <SearchIcon />
@@ -201,7 +198,6 @@ export default function PrimarySearchAppBar({
             />
           </Search>
 
-          {/* Right Section */}
           <Box
             sx={{
               display: "flex",
@@ -210,7 +206,7 @@ export default function PrimarySearchAppBar({
               paddingLeft: 10,
             }}
           >
-            {/* Wishlist Icon */}
+
             <IconButton
               onClick={wishlistButton}
               size="large"
@@ -222,7 +218,6 @@ export default function PrimarySearchAppBar({
               </Badge>
             </IconButton>
 
-            {/* Cart Icon */}
             <IconButton
               onClick={cartButton}
               size="large"
@@ -234,7 +229,6 @@ export default function PrimarySearchAppBar({
               </Badge>
             </IconButton>
 
-            {/* Account Icon */}
             <IconButton
               size="large"
               edge="end"

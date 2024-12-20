@@ -11,9 +11,9 @@ import {
   Skeleton,
 } from "@mui/material";
 import Cookies from "js-cookie";
-import apiClient from "../axios.js"; // Pastikan apiClient sudah di-import
-import FavoriteIcon from "@mui/icons-material/Favorite"; // Import ikon hati untuk wishlist
-import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart"; // Import ikon keranjang untuk cart
+import apiClient from "../axios.js";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 
 const ProductDetail = ({
   onAddCart,
@@ -49,21 +49,18 @@ const ProductDetail = ({
     fetchProductDetails();
   }, [id]);
 
-  // Memperbarui status cart
   useEffect(() => {
     if (product && Array.isArray(cart)) {
-      setInCart(cart.includes(product.id)); // Mengecek apakah produk ada di cart
+      setInCart(cart.includes(product.id));
     }
   }, [product, cart]);
 
-  // Memperbarui status wishlist
   useEffect(() => {
     if (product && Array.isArray(wishlist)) {
-      setIsInWishlist(wishlist.includes(product.id)); // Mengecek apakah produk ada di wishlist
+      setIsInWishlist(wishlist.includes(product.id));
     }
   }, [product, wishlist]);
 
-  // Menambahkan produk ke wishlist
   const addToWishlist = async (productId) => {
     try {
       const token = Cookies.get("accessToken");
@@ -74,26 +71,24 @@ const ProductDetail = ({
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      onUpdateWishlist(productId); // Update wishlist di komponen induk
+      onUpdateWishlist(productId);
     } catch (err) {
       console.error("Failed to add product to wishlist", err);
     }
   };
 
-  // Menghapus produk dari wishlist
   const removeFromWishlist = async (productId) => {
     try {
       const token = Cookies.get("accessToken");
       await apiClient.delete(`/wishlist/remove/${productId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      onUpdateWishlist(productId); // Update wishlist di komponen induk
+      onUpdateWishlist(productId);
     } catch (err) {
       console.error("Failed to remove product from wishlist", err);
     }
   };
 
-  // Menambah produk ke keranjang atau menghapusnya
   const handleAddToCart = () => {
     if (inCart) {
       onRemoveCart(product.id);
@@ -102,7 +97,6 @@ const ProductDetail = ({
     }
   };
 
-  // Menampilkan tampilan loading
   if (loading)
     return (
       <Container maxWidth="lg" sx={{ paddingY: 4, paddingTop: 17 }}>
@@ -147,7 +141,6 @@ const ProductDetail = ({
       </Container>
     );
 
-  // Menampilkan error jika ada
   if (error) return <div>{error}</div>;
 
   return (
