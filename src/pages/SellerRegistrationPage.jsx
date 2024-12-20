@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { Box, Typography, TextField, Button } from "@mui/material";
 import { styled, ThemeProvider, createTheme } from "@mui/material/styles";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import Cookies from "js-cookie";
 import apiClient from "../axios.js";
 
@@ -28,7 +28,7 @@ const FormBox = styled(Box)(({ theme }) => ({
   alignItems: "center",
   marginLeft: "50%",
   width: "50%",
-  height: "100%",
+  height: "852px",
   boxShadow: theme.shadows[5],
   paddingTop: "40px",
 }));
@@ -38,15 +38,6 @@ const Title = styled(Typography)(({ theme }) => ({
   fontWeight: "bold",
   textAlign: "center",
   marginBottom: theme.spacing(3),
-}));
-
-const LogoText = styled(Typography)(({ theme }) => ({
-  position: "absolute",
-  top: "20px",
-  left: "20px",
-  fontSize: "36px",
-  fontWeight: "bold",
-  color: "#FFFFFF",
 }));
 
 export default function SellerRegistrationPage() {
@@ -71,6 +62,7 @@ export default function SellerRegistrationPage() {
     setMessage("");
 
     const token = Cookies.get("accessToken");
+    console.log("Message:", formData);
 
     try {
       const response = await apiClient.post(
@@ -88,11 +80,12 @@ export default function SellerRegistrationPage() {
           },
         }
       );
+      console.log("Message:", response);
 
       setMessage("Registration successful!");
       navigate(`/dashboardseller/${formData.storeDomain}`);
     } catch (error) {
-      setMessage("Registration failed. Please try again.");
+      setMessage(<Typography>User already has a registered store.</Typography>);
     } finally {
       setLoading(false);
     }
@@ -101,7 +94,6 @@ export default function SellerRegistrationPage() {
   return (
     <ThemeProvider theme={theme}>
       <Wrapper>
-        <LogoText>PAWMART</LogoText>
         <FormBox>
           <Box sx={{ marginTop: "150px", width: "85%" }}>
             <Title>Seller Registration</Title>
@@ -161,8 +153,12 @@ export default function SellerRegistrationPage() {
             </form>
             {message && (
               <Typography
-                color={message.includes("failed") ? "error" : "primary"}
-                sx={{ marginTop: 2 }}
+                color={
+                  typeof message === "string" && message.includes("failed")
+                    ? "error"
+                    : "primary"
+                }
+                sx={{ marginTop: 2, textAlign: "center" }}
               >
                 {message}
               </Typography>

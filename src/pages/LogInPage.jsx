@@ -102,13 +102,16 @@ export default function LogInPage() {
       console.log(response);
 
       if (response.data.status === "success") {
-        Cookies.set("accessToken", response.data.access_token, {
-          expires: 7,
-        });
+        Cookies.set("accessToken", response.data.access_token, { expires: 7 });
         console.log("Token Set:", Cookies.get("accessToken"));
+
         Cookies.set("refreshToken", response.data.refresh_token, {
           expires: 7,
         });
+
+        Cookies.set("store_domain", response.data.store_domain, { expires: 7 });
+
+        Cookies.set("is_seller", response.data.is_seller, { expires: 7 });
         setAlertMessage("Login successful! Redirecting...");
         setAlertSeverity("success");
         setShowAlert(true);

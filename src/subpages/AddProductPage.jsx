@@ -120,7 +120,7 @@ const AddProductPage = () => {
     setImages(event.target.files);
   };
 
-  const handleSubmit = async () => {
+  const handleSave = async () => {
     const formData = new FormData();
     formData.append("nama_produk", productName);
     formData.append("deskripsi", description);
@@ -132,7 +132,16 @@ const AddProductPage = () => {
     Array.from(images).forEach((file) => formData.append("images", file));
 
     const token = Cookies.get("accessToken");
+    const storeDomain = Cookies.get("store_domain") || "";
+
     console.log("Token from cookies:", token);
+    console.log("Store domain from cookies:", storeDomain);
+    console.log("Form data:", Object.fromEntries(formData.entries()));
+
+    if (!token || !storeDomain) {
+      console.error("Missing token or store domain.");
+      return;
+    }
 
     try {
       await apiClient.post("/seller/create-products", formData, {
@@ -141,14 +150,19 @@ const AddProductPage = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      navigate("/dashboardseller");
+      console.log("Product added successfully:", response.data);
+
+      alert("Products created successfully!");
+      navigate(`/dashboardseller/${storeDomain}`);
     } catch (error) {
-      console.error("Failed to add product", error);
+      console.error("Failed to add product:", error);
+
+      alert("An error occurred while creating the product.");
     }
   };
 
   const handleCancel = () => {
-    navigate("/dashboardseller");
+    navigate(`/dashboardseller/${storeDomain}`);
   };
 
   return (
@@ -419,7 +433,7 @@ const AddProductPage = () => {
           <Button
             variant="contained"
             color="primary"
-            onClick={handleSubmit}
+            onClick={handleSave}
             sx={{
               height: "40px",
             }}
