@@ -141,6 +141,8 @@ const EditProductPage = () => {
       });
   }, [productId, token]);
 
+  const storeDomain = Cookies.get("storeDomain");
+
   const handleSubmit = () => {
     apiClient
       .put(
@@ -164,7 +166,7 @@ const EditProductPage = () => {
       )
       .then((response) => {
         console.log("Product updated:", response.data);
-        navigate(`/dashboardseller/${formData.storeDomain}/productlist`, {
+        navigate(`/dashboardseller/${storeDomain}/productlist`, {
           state: { updatedProduct: response.data.product },
         });
       })
@@ -174,7 +176,7 @@ const EditProductPage = () => {
   };
 
   const handleDiscard = () => {
-    navigate(`/dashboardseller/${formData.storeDomain}/productlist`);
+    navigate(`/dashboardseller/${storeDomain}/productlist`);
   };
   return (
     <ThemeProvider theme={theme}>
@@ -472,7 +474,7 @@ const EditProductPage = () => {
             onClick={() => {
               handleSubmit();
               console.log("Save product changes", product);
-              navigate(`/dashboardseller/${formData.storeDomain}/productlist`);
+              navigate(`/dashboardseller/${storeDomain}/productlist`);
             }}
           >
             Save Changes
