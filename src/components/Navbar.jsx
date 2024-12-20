@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { styled, alpha } from "@mui/material/styles";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
@@ -12,8 +12,8 @@ import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
 import SearchIcon from "@mui/icons-material/Search";
 import AccountCircle from "@mui/icons-material/AccountCircle";
-import NotificationsIcon from "@mui/icons-material/Notifications";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import FavoriteIcon from "@mui/icons-material/Favorite"; 
 import { Button } from "@mui/material";
 
 const Search = styled("div")(({ theme }) => ({
@@ -55,7 +55,11 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-export default function PrimarySearchAppBar({ cartCount }) {
+export default function PrimarySearchAppBar({
+  cartCount,
+  wishlistCount,
+  onWishlistClick,
+}) {
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
@@ -75,6 +79,10 @@ export default function PrimarySearchAppBar({ cartCount }) {
 
   const cartButton = () => {
     navigate("/cart");
+  };
+
+  const wishlistButton = () => {
+    navigate("/wishlist");
   };
 
   const handleProfileMenuOpen = (event) => {
@@ -133,16 +141,14 @@ export default function PrimarySearchAppBar({ cartCount }) {
       open={isMobileMenuOpen}
       onClose={handleMobileMenuClose}
     >
-      {/* <MenuItem>
-        <IconButton onClick={cartButton} size="large" aria-label="show 4 new mails" color="inherit">
-          <Badge badgeContent={4} color="error">
-            <ShoppingCartIcon />
-          </Badge>
-        </IconButton>
-        <p>Cart</p>
-      </MenuItem> */}
       <MenuItem onClick={handleProfileMenuOpen}>
-        <IconButton size="large" aria-label="account of current user" aria-controls="primary-search-account-menu" aria-haspopup="true" color="inherit">
+        <IconButton
+          size="large"
+          aria-label="account of current user"
+          aria-controls="primary-search-account-menu"
+          aria-haspopup="true"
+          color="inherit"
+        >
           <AccountCircle />
         </IconButton>
         <p>Profile</p>
@@ -163,30 +169,75 @@ export default function PrimarySearchAppBar({ cartCount }) {
             height: "80px",
           }}
         >
-          {/* Left Section */}
-          <Box sx={{ display: "flex", alignItems: "center", paddingRight: 10, paddingLeft: 10 }}>
-            <Button onClick={homeButton} variant="h6" noWrap component="div" sx={{ display: { xs: "none", sm: "block" } }}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              paddingRight: 10,
+              paddingLeft: 10,
+            }}
+          >
+            <Button
+              onClick={homeButton}
+              variant="h6"
+              noWrap
+              component="div"
+              sx={{ display: { xs: "none", sm: "block" } }}
+            >
               <Typography>PawShop</Typography>
             </Button>
           </Box>
 
-          {/* Center Section */}
           <Search sx={{ alignItems: "center" }}>
             <SearchIconWrapper>
               <SearchIcon />
             </SearchIconWrapper>
-            <StyledInputBase placeholder="Search…" inputProps={{ "aria-label": "search" }} />
+            <StyledInputBase
+              placeholder="Search…"
+              inputProps={{ "aria-label": "search" }}
+            />
           </Search>
 
-          {/* Right Section */}
-          <Box sx={{ display: "flex", alignItems: "center", paddingRight: 10, paddingLeft: 10 }}>
-            <IconButton onClick={cartButton} size="large" aria-label="show 4 new mails" color="inherit">
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              paddingRight: 10,
+              paddingLeft: 10,
+            }}
+          >
+
+            <IconButton
+              onClick={wishlistButton}
+              size="large"
+              aria-label="wishlist"
+              color="inherit"
+            >
+              <Badge badgeContent={wishlistCount} color="error">
+                <FavoriteIcon />
+              </Badge>
+            </IconButton>
+
+            <IconButton
+              onClick={cartButton}
+              size="large"
+              aria-label="show cart"
+              color="inherit"
+            >
               <Badge badgeContent={cartCount} color="error">
                 <ShoppingCartIcon />
               </Badge>
             </IconButton>
 
-            <IconButton size="large" edge="end" aria-label="account of current user" aria-controls={menuId} aria-haspopup="true" onClick={handleProfileMenuOpen} color="inherit">
+            <IconButton
+              size="large"
+              edge="end"
+              aria-label="account of current user"
+              aria-controls={menuId}
+              aria-haspopup="true"
+              onClick={handleProfileMenuOpen}
+              color="inherit"
+            >
               <AccountCircle />
             </IconButton>
           </Box>

@@ -1,32 +1,36 @@
-import axios from "axios";
 import { useEffect, useState } from "react";
-import { API_URL } from "../constants/Contsant";
+import Cookies from "js-cookie";
+import apiClient from "../axios.js";
 
 export default function useFilterData(category) {
   const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const fetchData = async () => {
-    const endpoint = category ? `${API_URL}/category/${category}` : API_URL;
-
+  const fetchProducts = async () => {
     try {
-      const response = await axios.get(endpoint);
-      console.log(endpoint);
-      if (!response) {
-        throw new Error("Error while fethcing data");
-      }
-      console.log(response);
-      setProducts(response.data);
+      const token = Cookies.get("accessToken");
+      const response = await apiClient.get("products", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setProducts(response.data.products || []);
+      setLoading(false);
     } catch (error) {
-      console.error(error);
+      console.error("Error fetching products:", error.response || error.message);
+      setError(error.message);
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchData();
+    fetchProducts();
   }, [category]);
 
-  console.log("products", products);
   return {
     products,
+    loading,
+    error,
   };
 }
