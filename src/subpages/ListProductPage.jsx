@@ -9,7 +9,6 @@ import {
   styled,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import Promotions from "../components/Promotions";
 import DeleteProductModal from "../modals/DeleteProductModal";
 import apiClient from "../axios.js";
 import Cookies from "js-cookie";
@@ -31,6 +30,7 @@ const StyledButton = styled(Button)(({ theme }) => ({
 const ListProductPage = () => {
   const navigate = useNavigate();
   const [products, setProducts] = useState([]);
+  const [promotions, setPromotions] = useState([]);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
   const [selectedPromotions, setSelectedPromotions] = useState({});
@@ -40,28 +40,39 @@ const ListProductPage = () => {
     const fetchProducts = async () => {
       try {
         const token = Cookies.get("accessToken");
-        console.log("Token from cookies:", token);
-
         const response = await apiClient.get("/seller/products", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
-
-        console.log("API Response:", response.data);
         setProducts(response.data.products || []);
       } catch (error) {
         console.error(
           "Error fetching products:",
           error.response || error.message
         );
-        if (error.response?.status === 403) {
-          console.error("Authorization failed. Please check your token.");
-        }
+      }
+    };
+
+    const fetchPromotions = async () => {
+      try {
+        const token = Cookies.get("accessToken");
+        const response = await apiClient.get("/promotions", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setPromotions(response.data.promotions || []);
+      } catch (error) {
+        console.error(
+          "Error fetching promotions:",
+          error.response || error.message
+        );
       }
     };
 
     fetchProducts();
+    fetchPromotions();
   }, []);
 
   const handleEdit = (productId) => {
@@ -76,6 +87,23 @@ const ListProductPage = () => {
   const handleCloseDeleteModal = () => {
     setOpenDeleteModal(false);
     setProductToDelete(null);
+  };
+
+  const handleDeleteProduct = async () => {
+    try {
+      const token = Cookies.get("accessToken");
+      await apiClient.delete(`/seller/products/${productToDelete}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setProducts(products.filter((product) => product.id !== productToDelete));
+
+      handleCloseDeleteModal();
+    } catch (error) {
+      console.error("Error deleting product:", error.response || error.message);
+    }
   };
 
   const handlePromotionChange = (productId, promotionId) => {
@@ -146,15 +174,13 @@ const ListProductPage = () => {
 
       {products.length > 0 ? (
         products.map((product) => {
-          console.log(product);
           const promotionId = selectedPromotions[product.id];
-          const promotion = Promotions.find(
+          const promotion = promotions.find(
             (promo) => promo.id === promotionId
           );
           const discountedPrice = promotion
             ? getDiscountedPrice(product.harga, promotion.discount)
             : null;
-
           const formattedPrice = product.harga
             ? product.harga.toLocaleString("id-ID", {
                 style: "currency",
@@ -194,8 +220,7 @@ const ListProductPage = () => {
                     >
                       {formattedPrice}
                     </span>
-                    &nbsp;&nbsp;
-                    <span>{formattedDiscountedPrice}</span>
+                    &nbsp;&nbsp;<span>{formattedDiscountedPrice}</span>
                   </>
                 ) : (
                   `${formattedPrice}`
@@ -229,9 +254,9 @@ const ListProductPage = () => {
                   <MenuItem value="" disabled>
                     Select Promotion
                   </MenuItem>
-                  {Promotions.map((promotion) => (
+                  {promotions.map((promotion) => (
                     <MenuItem key={promotion.id} value={promotion.id}>
-                      {promotion.name} - {promotion.discount}%
+                      {promotion.promotion_name} - {promotion.discount}%
                     </MenuItem>
                   ))}
                 </StyledSelect>
@@ -263,7 +288,7 @@ const ListProductPage = () => {
         <DeleteProductModal
           open={openDeleteModal}
           onClose={handleCloseDeleteModal}
-          productId={productToDelete}
+          onConfirm={handleDeleteProduct}
         />
       )}
     </Box>
