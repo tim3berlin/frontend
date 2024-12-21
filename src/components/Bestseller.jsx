@@ -22,10 +22,7 @@ const Bestseller = ({ onAddCart, onRemoveCart, cart = [] }) => {
       setProducts(response.data.products || []);
       setLoading(false);
     } catch (error) {
-      console.error(
-        "Error fetching products:",
-        error.response || error.message
-      );
+      console.error("Error fetching products:", error.response || error.message);
       setError(error.message);
       setLoading(false);
     }
@@ -86,7 +83,7 @@ const Bestseller = ({ onAddCart, onRemoveCart, cart = [] }) => {
         <Grid item xs={12} sm={4}>
           <Box
             sx={{
-              backgroundColor: "#d8f8a7",
+              backgroundColor: "#3AB4F2",
               padding: 3,
               borderRadius: 2,
               display: "flex",
@@ -96,38 +93,28 @@ const Bestseller = ({ onAddCart, onRemoveCart, cart = [] }) => {
               textAlign: "left",
             }}
           >
-            <Typography variant="h6" fontWeight="bold">
-              Kategori Anjing
-            </Typography>
-            <Typography variant="body2" sx={{ marginBottom: 2 }}>
-              Semua kebutuhan Anjing kesayangan
-            </Typography>
-            <Button
-              variant="contained"
-              color="primary"
-              sx={{ borderRadius: 20, textTransform: "none" }}
-            >
-              Beli Sekarang
-            </Button>
+            <Box sx={{ color: "white" }}>
+              <Typography variant="h6" fontWeight="bold">
+                Kategori Anjing
+              </Typography>
+              <Typography variant="body2" sx={{ marginBottom: 2 }}>
+                Semua kebutuhan Anjing kesayangan
+              </Typography>
+            </Box>
             <Typography
               variant="h4"
               fontWeight="bold"
               color="error"
               sx={{
                 marginTop: 3,
-                backgroundColor: "yellow",
+                backgroundColor: "#F2DF3A",
                 padding: "4px 10px",
                 borderRadius: "5px",
               }}
             >
               50% Off
             </Typography>
-            <Box
-              component="img"
-              src="https://via.placeholder.com/200"
-              alt="Dog Food Banner"
-              sx={{ width: "100%", marginTop: 2 }}
-            />
+            <Box component="img" src="https://via.placeholder.com/200" alt="Dog Food Banner" sx={{ width: "100%", marginTop: 2 }} />
           </Box>
         </Grid>
 

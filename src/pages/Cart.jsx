@@ -1,20 +1,25 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
-import { API_URL } from "../constants/Contsant";
+import Cookies from "js-cookie";
+import apiClient from "../axios.js";
 import TableCart from "../components/TableCart";
 
 const Cart = ({ cart = [], setCart, onCheckout }) => {
   const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const fetchData = async () => {
     try {
-      const response = await axios.get(API_URL);
-      if (!response) {
-        throw new Error("Error while fetching data");
-      }
-      setProducts(response.data);
+      const token = Cookies.get("accessToken");
+      const response = await apiClient.get("cart/items", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setProducts(response.data.cart || []);
     } catch (error) {
-      console.error(error);
+      console.error("Error fetching products:", error.response?.data || error.message);
+      setError(error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -22,8 +27,12 @@ const Cart = ({ cart = [], setCart, onCheckout }) => {
     fetchData();
   }, []);
 
-  const cartItems = Array.isArray(cart) ? products.filter((product) => cart.includes(product.id)) : [];
-  const totalPrice = cartItems.reduce((total, product) => total + product.price, 0);
+  const cartItems = Array.isArray(cart) ? products.filter((product) => cart.some((item) => item.product_id === product.id)) : [];
+
+  const totalPrice = cartItems.reduce((total, product) => {
+    const item = cart.find((item) => item.product_id === product.id);
+    return total + product.price * (item?.quantity || 1);
+  }, 0);
 
   const clearCart = () => {
     if (typeof setCart === "function") {
@@ -32,6 +41,9 @@ const Cart = ({ cart = [], setCart, onCheckout }) => {
       console.error("setCart is not a function");
     }
   };
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
 
   return (
     <div
