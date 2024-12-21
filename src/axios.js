@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const apiurl = process.env.REACT_APP_APIURI;
+const apiurl = "https://objective-maddi-harisafriansyah-03974b59.koyeb.app/";
 console.log("Test Halo:", apiurl);
 
 const apiClient = axios.create({
