@@ -10,7 +10,7 @@ const StyledLogoText = styled(Typography)(({ theme }) => ({
 }));
 
 const LogoText = () => {
-  return <StyledLogoText>PAWMART</StyledLogoText>;
+  return <StyledLogoText>PAWSHOP</StyledLogoText>;
 };
 
 export default LogoText;

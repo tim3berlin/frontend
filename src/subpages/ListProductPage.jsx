@@ -53,7 +53,6 @@ const ListProductPage = () => {
         );
       }
     };
-
     const fetchPromotions = async () => {
       try {
         const token = Cookies.get("accessToken");
@@ -73,10 +72,10 @@ const ListProductPage = () => {
 
     fetchProducts();
     fetchPromotions();
-  }, []);
+  }, [location.state?.refresh]);
 
   const handleEdit = (productId) => {
-    navigate(`/editproduct/${productId}`);
+    navigate(`/editproduct/${productId}`, { state: { refresh: true } });
   };
 
   const handleDelete = (productId) => {
@@ -223,7 +222,7 @@ const ListProductPage = () => {
                     &nbsp;&nbsp;<span>{formattedDiscountedPrice}</span>
                   </>
                 ) : (
-                  `${formattedPrice}`
+                  formattedPrice
                 )}
               </Typography>
               <Typography

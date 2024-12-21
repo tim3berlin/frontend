@@ -144,26 +144,27 @@ const EditProductPage = () => {
   const storeDomain = Cookies.get("storeDomain");
 
   const handleSubmit = () => {
+    const formData = new FormData();
+
+    formData.append("nama_produk", product.name);
+    formData.append("deskripsi", product.description);
+    formData.append("harga", product.price);
+    formData.append("stok", product.stock);
+    formData.append("kategori", product.category);
+    formData.append("jenis_hewan", product.animalCategory);
+    formData.append("berat", product.weight);
+
+    product.photos.forEach((photo, index) => {
+      formData.append(`images[${index}]`, photo);
+    });
+
     apiClient
-      .put(
-        `/seller/products/${productId}`,
-        {
-          nama_produk: product.name,
-          deskripsi: product.description,
-          harga: product.price,
-          stok: product.stock,
-          kategori: product.category,
-          jenis_hewan: product.animalCategory,
-          berat: product.weight,
-          images: product.photos,
+      .put(`/seller/products/${productId}`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
         },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      )
+      })
       .then((response) => {
         console.log("Product updated:", response.data);
         navigate(`/dashboardseller/${storeDomain}/productlist`, {
@@ -178,6 +179,7 @@ const EditProductPage = () => {
   const handleDiscard = () => {
     navigate(`/dashboardseller/${storeDomain}/productlist`);
   };
+
   return (
     <ThemeProvider theme={theme}>
       <EditProductContainer>
@@ -212,7 +214,7 @@ const EditProductPage = () => {
               <TextField
                 fullWidth
                 variant="outlined"
-                value={product ? product.name : ""}
+                value={product.name}
                 onChange={(e) =>
                   setProduct({ ...product, name: e.target.value })
                 }
@@ -256,6 +258,7 @@ const EditProductPage = () => {
               </FormControl>
             </Box>
           </FormRow>
+
           <FormRow>
             <Box sx={{ width: "30%" }}>
               <FormLabel>Category</FormLabel>
@@ -380,7 +383,7 @@ const EditProductPage = () => {
               <TextField
                 fullWidth
                 variant="outlined"
-                value={product.harga}
+                value={product.price}
                 onChange={handlePriceChange}
                 InputProps={{
                   startAdornment: (
@@ -474,7 +477,6 @@ const EditProductPage = () => {
             onClick={() => {
               handleSubmit();
               console.log("Save product changes", product);
-              navigate(`/dashboardseller/${storeDomain}/productlist`);
             }}
           >
             Save Changes
