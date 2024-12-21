@@ -5,8 +5,14 @@ import "slick-carousel/slick/slick-theme.css";
 import { Box, Typography } from "@mui/material";
 
 const images = [
-  { imgPath: "https://st3.depositphotos.com/1938399/16420/i/450/depositphotos_164208124-stock-photo-jakarta-cityscape-at-night.jpg" },
-  { imgPath: "https://st2.depositphotos.com/7525912/11141/i/450/depositphotos_111416864-stock-photo-jakarta-city-indonesia.jpg" },
+  {
+    imgPath:
+      "https://bhj.com/media/2079/dry_petfood_banner_1.jpg?anchor=center&mode=crop&width=1410&height=500&bgcolor=ffff&autowebp=1",
+  },
+  {
+    imgPath:
+      "https://t3.ftcdn.net/jpg/09/58/23/72/240_F_958237227_1BASKnM7JvHQHQ4f3t6Hv5ztz2iRTLIt.jpg",
+  },
 ];
 
 const Carousel = () => {

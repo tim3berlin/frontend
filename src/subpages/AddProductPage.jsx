@@ -120,6 +120,9 @@ const AddProductPage = () => {
     setImages(event.target.files);
   };
 
+  const token = Cookies.get("accessToken");
+  const storeDomain = Cookies.get("store_domain") || "";
+
   const handleSave = async () => {
     const formData = new FormData();
     formData.append("nama_produk", productName);
@@ -130,13 +133,6 @@ const AddProductPage = () => {
     formData.append("jenis_hewan", animalCategory);
     formData.append("berat", weight);
     Array.from(images).forEach((file) => formData.append("images", file));
-
-    const token = Cookies.get("accessToken");
-    const storeDomain = Cookies.get("store_domain") || "";
-
-    console.log("Token from cookies:", token);
-    console.log("Store domain from cookies:", storeDomain);
-    console.log("Form data:", Object.fromEntries(formData.entries()));
 
     if (!token || !storeDomain) {
       console.error("Missing token or store domain.");
@@ -150,7 +146,6 @@ const AddProductPage = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log("Product added successfully:", response.data);
 
       alert("Products created successfully!");
       navigate(`/dashboardseller/${storeDomain}`);
