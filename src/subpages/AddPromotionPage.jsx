@@ -77,11 +77,11 @@ const AddPromotionPage = () => {
     return `${hours}:${minutes < 10 ? "0" + minutes : minutes}`;
   };
 
+  const token = Cookies.get("accessToken");
+  const storeDomain = Cookies.get("store_domain") || "";
+
   const handleSave = async () => {
     try {
-      const token = Cookies.get("accessToken");
-      const storeDomain = Cookies.get("store_domain") || "";
-      console.log("Token from cookies:", token);
 
       const payload = {
         promotion_name: promotionName,
@@ -99,7 +99,6 @@ const AddPromotionPage = () => {
         },
       });
 
-      console.log("Payload:", payload);
       console.log("Headers:", {
         Authorization: `Bearer ${token}`,
       });

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Box, Typography, Button, styled } from "@mui/material";
-// import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import DeletePromotionModal from "../modals/DeletePromotionModal";
 import apiClient from "../axios.js";
 import Cookies from "js-cookie";
@@ -12,17 +12,16 @@ const StyledButton = styled(Button)(({ theme }) => ({
 }));
 
 const ListPromotionPage = () => {
-  const navigate = useNavigate();
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [promotionToDelete, setPromotionToDelete] = useState(null);
   const [promotions, setPromotions] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const token = Cookies.get("accessToken");
   useEffect(() => {
     const fetchPromotions = async () => {
       try {
         const token = Cookies.get("accessToken");
-        console.log("Token from cookies:", token);
 
         const response = await apiClient.get("/promotions", {
           headers: {

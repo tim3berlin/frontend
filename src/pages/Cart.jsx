@@ -12,6 +12,7 @@ const Cart = ({ cart = [], setCart, onCheckout }) => {
     try {
       const token = Cookies.get("accessToken");
       const response = await apiClient.get("cart/items", {
+        "Content-Type": "application/json",
         headers: { Authorization: `Bearer ${token}` },
       });
       setProducts(response.data.cart || []);
